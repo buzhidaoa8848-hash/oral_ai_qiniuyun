@@ -94,26 +94,21 @@ def post_turn(
     ]
 
     # ── Build scene dict ────────────────────────────────────
-    scene_dict = {
-        "title": scene.title,
-        "scene_type": scene.scene_type,
-        "style": scene.style,
-        "difficulty": scene.difficulty,
-        "ai_role": scene.ai_role,
-        "user_role": scene.user_role,
-        "task_goal": scene.task_goal,
-        "opening_question": scene.opening_question,
-        "follow_up_strategy": scene.follow_up_strategy,
-        "must_cover_points": scene.must_cover_points,
-    }
+    scene_dict = services.scene_to_dict(scene)
 
     # ── Generate reply ──────────────────────────────────────
     agent = ConversationAgent()
-    ai_reply = agent.reply(
-        scene=scene_dict,
-        history=history,
-        user_utterance=req.message,
-    )
+    try:
+        ai_reply = agent.reply(
+            scene=scene_dict,
+            history=history,
+            user_utterance=req.message,
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=502,
+            detail=f"AI 回复生成失败: {e}。请重试。",
+        )
 
     # ── Persist turns ───────────────────────────────────────
     user_turn, ai_turn = agent.summarize_turn(
@@ -129,20 +124,27 @@ def post_turn(
     db.refresh(ai_turn)
 
     # ── Run evaluation pipeline ──────────────────────────────
-    from ..agents.pipeline import EvaluationPipeline, build_eval_context
+    # Evaluation is non-blocking: if it fails, the conversation still works.
+    try:
+        from ..agents.pipeline import EvaluationPipeline, build_eval_context
 
-    profile = services.get_profile(session=db, profile_id=ps.profile_id)
-    eval_ctx = build_eval_context(
-        user_message=req.message,
-        ai_reply=ai_reply["reply"],
-        scene=scene,
-        turn_index=next_index,
-        session_id=session_id,
-        profile=profile,
-    )
-    pipeline = EvaluationPipeline()
-    eval_result = pipeline.run(db=db, user_turn_id=user_turn.id, ctx=eval_ctx)
-    light_hints = eval_result.light_hints
+        profile = services.get_profile(session=db, profile_id=ps.profile_id)
+        eval_ctx = build_eval_context(
+            user_message=req.message,
+            ai_reply=ai_reply["reply"],
+            scene=scene,
+            turn_index=next_index,
+            session_id=session_id,
+            profile=profile,
+        )
+        pipeline = EvaluationPipeline()
+        eval_result = pipeline.run(db=db, user_turn_id=user_turn.id, ctx=eval_ctx)
+        light_hints = eval_result.light_hints
+    except Exception:
+        logger = __import__("logging").getLogger("scenetalk.sessions")
+        logger.exception("Evaluation pipeline failed — conversation continues")
+        light_hints = []
+        eval_result = None
 
     # ── Build response ──────────────────────────────────────
     def _to_read(t: m.ConversationTurn) -> schemas.ConversationTurnRead:
@@ -172,11 +174,11 @@ def post_turn(
         ai_turn=_to_read(ai_turn),
         light_hints=light_hints,
         evaluation={
-            "grammar": eval_result.grammar.model_dump(),
-            "expression": eval_result.expression.model_dump(),
-            "naturalness": eval_result.naturalness.model_dump(),
-            "task_completion": eval_result.task_completion.model_dump(),
-            "profile": eval_result.profile.model_dump(),
+            "grammar": eval_result.grammar.model_dump() if eval_result else {},
+            "expression": eval_result.expression.model_dump() if eval_result else {},
+            "naturalness": eval_result.naturalness.model_dump() if eval_result else {},
+            "task_completion": eval_result.task_completion.model_dump() if eval_result else {},
+            "profile": eval_result.profile.model_dump() if eval_result else {},
         },
     )
 
