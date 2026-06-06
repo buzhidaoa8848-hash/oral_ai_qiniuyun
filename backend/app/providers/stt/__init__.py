@@ -7,6 +7,7 @@ from .mock_stt import MockSTTProvider
 from .openai_stt import OpenaiSTTProvider
 from .qwen_stt import QwenSTTProvider
 from .tencent_stt import TencentSTTProvider
+from .local_whisper_stt import LocalWhisperSTTProvider
 
 logger = logging.getLogger("scenetalk.providers.stt")
 
@@ -41,6 +42,10 @@ def get_stt_provider() -> BaseSTTProvider:
     elif provider_name == "tencent":
         logger.warning("STT provider: tencent not yet implemented → falling back to mock")
         return MockSTTProvider()
+
+    elif provider_name == "local_whisper" or provider_name == "whisper":
+        logger.info("STT provider: local whisper (tiny.en, CPU inference)")
+        return LocalWhisperSTTProvider()
 
     logger.info(f"STT provider: mock (unknown provider '{provider_name}')")
     return MockSTTProvider()

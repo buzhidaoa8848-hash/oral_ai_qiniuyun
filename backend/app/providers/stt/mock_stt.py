@@ -1,6 +1,7 @@
 """Mock STT — returns deterministic transcripts based on turn count."""
 
 import time
+import random
 from .base import BaseSTTProvider
 
 _MOCK_TRANSCRIPTS = [
@@ -12,16 +13,17 @@ _MOCK_TRANSCRIPTS = [
     "Thank you so much for your time today. I really appreciate the opportunity to speak with you.",
 ]
 
+# Module-level counter so transcripts cycle across provider instances
+_call_count = 0
+
 
 class MockSTTProvider(BaseSTTProvider):
-    """Returns canned transcripts — always succeeds."""
-
-    def __init__(self) -> None:
-        self._call_count = 0
+    """Returns canned transcripts — always succeeds and cycles through varied replies."""
 
     def transcribe(self, audio_bytes: bytes, mime_type: str = "audio/webm") -> str:
+        global _call_count
         # Simulate STT latency (80-200ms)
-        time.sleep(0.1)
-        idx = self._call_count % len(_MOCK_TRANSCRIPTS)
-        self._call_count += 1
+        time.sleep(0.05 + random.random() * 0.15)
+        idx = _call_count % len(_MOCK_TRANSCRIPTS)
+        _call_count += 1
         return _MOCK_TRANSCRIPTS[idx]

@@ -23,6 +23,7 @@ class OpenaiSTTProvider(BaseSTTProvider):
 
     def __init__(self, api_key: str = "") -> None:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY", "")
+        self.base_url = os.getenv("OPENAI_BASE_URL", None)  # 支持中转站
 
     def transcribe(self, audio_bytes: bytes, mime_type: str = "audio/wav") -> str:
         if not self.api_key:
@@ -33,7 +34,10 @@ class OpenaiSTTProvider(BaseSTTProvider):
         except ImportError:
             raise RuntimeError("openai 包未安装。请运行: pip install openai")
 
-        client = OpenAI(api_key=self.api_key)
+        client_kwargs = {"api_key": self.api_key}
+        if self.base_url:
+            client_kwargs["base_url"] = self.base_url
+        client = OpenAI(**client_kwargs)
 
         # Map MIME type to file extension Whisper expects
         ext = self._ext_from_mime(mime_type)
