@@ -227,4 +227,25 @@ def delete_report(*, session: Session, report_id: uuid.UUID) -> bool:
         return False
     session.delete(report)
     session.commit()
+
+
+# ── Shared helpers ────────────────────────────────────────────
+
+def scene_to_dict(scene: m.SceneCard) -> dict:
+    """Convert a SceneCard ORM object to the dict shape consumed by ConversationAgent.
+
+    Used by both text-turn (sessions.py) and voice-turn (voice.py) routes.
+    """
+    return {
+        "title": scene.title,
+        "scene_type": scene.scene_type,
+        "style": scene.style,
+        "difficulty": scene.difficulty,
+        "ai_role": scene.ai_role,
+        "user_role": scene.user_role,
+        "task_goal": scene.task_goal,
+        "opening_question": scene.opening_question,
+        "follow_up_strategy": scene.follow_up_strategy,
+        "must_cover_points": scene.must_cover_points,
+    }
     return True

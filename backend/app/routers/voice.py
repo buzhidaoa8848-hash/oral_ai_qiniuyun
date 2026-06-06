@@ -141,18 +141,7 @@ async def _voice_turn_impl(
     next_index = max((t.turn_index for t in history_rows), default=-1) + 1
     history = [{"role": t.role, "message": t.message} for t in history_rows]
 
-    scene_dict = {
-        "title": scene.title,
-        "scene_type": scene.scene_type,
-        "style": scene.style,
-        "difficulty": scene.difficulty,
-        "ai_role": scene.ai_role,
-        "user_role": scene.user_role,
-        "task_goal": scene.task_goal,
-        "opening_question": scene.opening_question,
-        "follow_up_strategy": scene.follow_up_strategy,
-        "must_cover_points": scene.must_cover_points,
-    }
+    scene_dict = services.scene_to_dict(scene)
 
     agent = ConversationAgent()
     t_llm_start = time.perf_counter()
