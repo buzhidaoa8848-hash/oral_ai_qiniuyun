@@ -363,7 +363,15 @@ cee6624 chore: add .editorconfig and .prettierrc for consistent code style
 
 ## Demo 视频
 
-> [待添加 — 录制一条完整流程：首页→选身份→选水平→选场景→语音回答→AI追问→文字回答→结束→报告→If I were you]
+**SceneTalk AI 中文旁白 Demo**（在线观看，无需下载）
+
+<video src="https://raw.githubusercontent.com/buzhidaoa8848-hash/oral_ai_qiniuyun/main/media/scenetalk_ai_demo_v2_zh_no_subtitles.mp4" width="100%" controls></video>
+
+> 如果视频无法加载，点击 [这里直接观看](https://github.com/buzhidaoa8848-hash/oral_ai_qiniuyun/blob/main/media/scenetalk_ai_demo_v2_zh_no_subtitles.mp4)
+
+- 时长：2:58
+- 格式：16:9 横屏，1920×1080
+- 旁白稿：[demo_v2_voiceover_zh.txt](media/demo_v2_voiceover_zh.txt)
 
 ---
 
