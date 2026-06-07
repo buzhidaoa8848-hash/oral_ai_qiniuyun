@@ -363,9 +363,11 @@ cee6624 chore: add .editorconfig and .prettierrc for consistent code style
 
 ## Demo 视频
 
-**SceneTalk AI 中文旁白 Demo**（点击在线观看 👇）
+**SceneTalk AI 中文旁白 Demo**
 
-👉 **[▶️ 观看 Demo 视频](https://github.com/buzhidaoa8848-hash/oral_ai_qiniuyun/blob/main/media/scenetalk_ai_demo_v2_zh_no_subtitles.mp4)** — GitHub 内置播放器，无需下载、无需登录
+▶️ **[在 Bilibili 在线观看](https://www.bilibili.com/video/BV1fDE46dEDt)**
+
+> 视频文件在 `media/scenetalk_ai_demo_v2_zh_no_subtitles.mp4`
 
 - 时长：2:58
 - 格式：16:9 横屏，1920×1080
