@@ -310,7 +310,8 @@ def _wav_is_silent(data: bytes) -> bool:
 
         rms = (total / sample_count) ** 0.5
 
-        # RMS < 0.005 is essentially silent (typical speech RMS > 0.02)
-        return rms < 0.005
+        # Only reject absolute silence (all zero bytes)
+        # Normal speech has RMS > 0.005 even at low volume
+        return rms < 0.0001
     except Exception:
         return False  # can't determine → let STT decide
