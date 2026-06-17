@@ -57,14 +57,15 @@ app = FastAPI(
 )
 
 # ── Middleware ─────────────────────────────────────────────────
+frontend_origins = [
+    origin.strip()
+    for origin in settings.frontend_origins.split(",")
+    if origin.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3001",
-    ],
+    allow_origins=frontend_origins,
     allow_credentials=False,  # 不需要 cookie/auth token
     allow_methods=["*"],
     allow_headers=["*"],

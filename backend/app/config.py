@@ -10,6 +10,12 @@ class Settings(BaseSettings):
     # ── App ───────────────────────────────────────────────────
     app_name: str = "SceneTalk AI"
     debug: bool = True
+    frontend_origins: str = (
+        "http://localhost:3000,"
+        "http://127.0.0.1:3000,"
+        "http://localhost:3001,"
+        "http://127.0.0.1:3001"
+    )
 
     # ── Mock mode ─────────────────────────────────────────────
     # When True, all LLM calls use MockProvider — no API keys needed.
